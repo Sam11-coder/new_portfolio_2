@@ -17,17 +17,17 @@ function SocialLink({ href, children, label }) {
 
 export default function Footer() {
   return (
-    <footer style={{ borderTop: '1px solid var(--border)' }} className="py-8">
+    <footer style={{ borderTop: '1px solid var(--border)' }} className="py-8 mt-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs" style={{ color: 'var(--text-muted)' }}>
-        <span>&copy; {new Date().getFullYear()} Sameer. Built with intention.</span>
+        <span>&copy; {new Date().getFullYear()} Sameer Ahmadi</span>
         <div className="flex items-center gap-4">
           <SocialLink href="https://github.com/Sam11-coder" label="GitHub">
             <GitHubIcon className="w-4 h-4" />
           </SocialLink>
-          <SocialLink href="mailto:sameeralam1029@gmail.com" label="Email">
+          <SocialLink href="mailto:samirahmady01@gmail.com" label="Email">
             <EmailIcon className="w-4 h-4" />
           </SocialLink>
-          <SocialLink href="https://linkedin.com/in/sameer-alam11" label="LinkedIn">
+          <SocialLink href="https://www.linkedin.com/in/sameer-ahmadi-854749253/" label="LinkedIn">
             <LinkedInIcon className="w-4 h-4" />
           </SocialLink>
         </div>
