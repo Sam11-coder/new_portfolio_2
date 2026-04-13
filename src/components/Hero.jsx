@@ -49,7 +49,7 @@ export default function Hero() {
         </p>
         <div className="flex items-center gap-3 mt-8">
           <a
-            href="/resume.pdf"
+            href="/Ahmad_Sameer_Ahmadi_Resume.pdf"
             download
             className="resume-btn inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200"
             style={{

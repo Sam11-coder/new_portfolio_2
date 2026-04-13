@@ -38,7 +38,7 @@ export default function StatusBar() {
         </a>
         <div className="flex items-center gap-3">
           <a
-            href="/resume.pdf"
+            href="/Ahmad_Sameer_Ahmadi_Resume.pdf"
             download
             className="resume-btn hidden sm:inline-flex items-center gap-1.5 rounded-lg text-xs font-medium transition-all duration-200"
             style={{
