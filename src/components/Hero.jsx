@@ -1,18 +1,41 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { site } from '../data/site'
 import { prefersReducedMotion } from '../lib/motion'
 import { ChevronDownIcon, DownloadIcon } from './Icons'
 import ButtonLink from './ButtonLink'
 
-// What the terminal on the right types out, one command at a time.
-// It shows things the text on the left doesn't, so the hero doesn't repeat itself.
+// What the terminal types out, one command at a time.
+// It shows things the text beside it doesn't, so the hero doesn't repeat itself.
 const script = [
   { cmd: 'cat now.txt', out: ['Building an AI job aggregator.', 'Finishing term 4 at BCIT.'] },
   { cmd: 'cat this-site.txt', out: ['Runs in Docker on my home server,', 'online through a Cloudflare Tunnel.'] },
 ]
 
+// True once the element has been on screen (so the typing starts when people can see it,
+// which matters on phones where the terminal sits below the buttons).
+function useSeen(ref) {
+  // Very old browsers without IntersectionObserver just start typing right away
+  const [seen, setSeen] = useState(() => typeof IntersectionObserver === 'undefined')
+  useEffect(() => {
+    const el = ref.current
+    if (!el || seen) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setSeen(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.5 },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [ref, seen])
+  return seen
+}
+
 // Steps through the script: type the command letter by letter, pause, show its output, move on.
-function useTypedScript() {
+function useTypedScript(running) {
   const [pos, setPos] = useState(() => ({
     block: prefersReducedMotion() ? script.length : 0,
     chars: 0,
@@ -20,7 +43,7 @@ function useTypedScript() {
   }))
 
   useEffect(() => {
-    if (pos.block >= script.length) return
+    if (!running || pos.block >= script.length) return
     const { cmd } = script[pos.block]
     let timer
     if (pos.chars < cmd.length) {
@@ -31,7 +54,7 @@ function useTypedScript() {
       timer = setTimeout(() => setPos((p) => ({ block: p.block + 1, chars: 0, showOut: false })), 650)
     }
     return () => clearTimeout(timer)
-  }, [pos])
+  }, [pos, running])
 
   return pos
 }
@@ -49,11 +72,17 @@ function Prompt({ children }) {
 }
 
 function Terminal() {
-  const pos = useTypedScript()
+  const ref = useRef(null)
+  const seen = useSeen(ref)
+  const pos = useTypedScript(seen)
   const done = pos.block >= script.length
 
   return (
-    <div className="hidden lg:block relative rounded-2xl overflow-hidden shadow-2xl bg-surface border border-line animate-fade-in-up" aria-hidden="true">
+    <div
+      ref={ref}
+      className="relative rounded-2xl overflow-hidden shadow-2xl bg-surface border border-line animate-fade-in-up"
+      aria-hidden="true"
+    >
       <div className="flex items-center gap-1.5 px-4 py-3 border-b border-line">
         <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
         <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
@@ -61,7 +90,7 @@ function Terminal() {
         <span className="ml-3 text-xs font-mono text-muted">sameer@homelab: ~</span>
       </div>
       {/* min-h keeps the box from growing while it types */}
-      <div className="px-5 py-5 font-mono text-[13px] leading-relaxed min-h-[218px]">
+      <div className="px-4 py-4 sm:px-5 sm:py-5 font-mono text-xs sm:text-[13px] leading-relaxed min-h-[196px] sm:min-h-[218px]">
         {script.slice(0, pos.block + 1).map((block, i) => {
           const current = i === pos.block
           return (
@@ -94,7 +123,7 @@ export default function Hero() {
       <div className="hero-glow absolute -top-40 right-[-10%] w-[640px] h-[640px] rounded-full pointer-events-none" aria-hidden="true" />
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-16 sm:pt-28 sm:pb-24">
-        <div className="grid lg:grid-cols-[1.15fr_1fr] gap-12 items-center">
+        <div className="grid lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-12 items-center">
           <div className="animate-fade-in-up">
             <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full text-xs font-medium bg-surface text-accent border border-line">
               <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse-dot" />
@@ -124,11 +153,6 @@ export default function Hero() {
                 Resume
               </ButtonLink>
             </div>
-
-            {/* Phones don't get the terminal, so they get its "now" line here instead */}
-            <p className="lg:hidden mt-8 text-sm font-mono text-muted">
-              <span className="text-accent">right now:</span> building my AI job aggregator
-            </p>
           </div>
 
           <Terminal />
