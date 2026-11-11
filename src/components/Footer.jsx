@@ -1,36 +1,18 @@
-import { GitHubIcon, EmailIcon, LinkedInIcon } from './Icons'
-
-function SocialLink({ href, children, label }) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={label}
-      className="transition-colors hover:text-[var(--accent)]"
-      style={{ color: 'var(--text-muted)' }}
-    >
-      {children}
-    </a>
-  )
-}
+import { site } from '../data/site'
+import SocialLinks from './SocialLinks'
 
 export default function Footer() {
   return (
-    <footer style={{ borderTop: '1px solid var(--border)' }} className="py-8 mt-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs" style={{ color: 'var(--text-muted)' }}>
-        <span>&copy; {new Date().getFullYear()} Sameer Ahmadi</span>
-        <div className="flex items-center gap-4">
-          <SocialLink href="https://github.com/Sam11-coder" label="GitHub">
-            <GitHubIcon className="w-4 h-4" />
-          </SocialLink>
-          <SocialLink href="mailto:samirahmady01@gmail.com" label="Email">
-            <EmailIcon className="w-4 h-4" />
-          </SocialLink>
-          <SocialLink href="https://www.linkedin.com/in/sameer-ahmadi-854749253/" label="LinkedIn">
-            <LinkedInIcon className="w-4 h-4" />
-          </SocialLink>
+    <footer className="py-8 mt-8 border-t border-line">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted">
+        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-5">
+          <span>&copy; {new Date().getFullYear()} {site.name}</span>
+          <span className="inline-flex items-center gap-2 font-mono">
+            <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse-dot" />
+            served from my home server
+          </span>
         </div>
+        <SocialLinks />
       </div>
     </footer>
   )

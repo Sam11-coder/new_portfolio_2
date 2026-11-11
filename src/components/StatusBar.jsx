@@ -1,80 +1,126 @@
-import { useTheme } from '../context/ThemeContext'
-import { GitHubIcon, EmailIcon, LinkedInIcon, SunIcon, MoonIcon } from './Icons'
+import { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { useTheme } from '../context/theme'
+import { site } from '../data/site'
+import { SunIcon, MoonIcon, DownloadIcon } from './Icons'
+import SocialLinks from './SocialLinks'
 
-function SocialLink({ href, children, label }) {
+const navLinks = [
+  { hash: '#about', label: 'About' },
+  { hash: '#skills', label: 'Skills' },
+  { hash: '#projects', label: 'Projects' },
+  { hash: '#contact', label: 'Contact' },
+]
+
+function MenuIcon({ open }) {
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={label}
-      className="transition-colors hover:text-[var(--accent)]"
-      style={{ color: 'var(--text-muted)' }}
-    >
-      {children}
-    </a>
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" aria-hidden="true">
+      {open ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
+    </svg>
   )
 }
 
+// Sticky top bar. On phones the links move into a dropdown menu.
 export default function StatusBar() {
   const { dark, toggle } = useTheme()
+  const location = useLocation()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [menuFor, setMenuFor] = useState(location.key)
+
+  // Close the phone menu whenever the page or section changes
+  if (menuFor !== location.key) {
+    setMenuFor(location.key)
+    setMenuOpen(false)
+  }
+
+  // ...and when Escape is pressed
+  useEffect(() => {
+    if (!menuOpen) return
+    const onKey = (e) => e.key === 'Escape' && setMenuOpen(false)
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [menuOpen])
 
   return (
-    <header
-      className="sticky top-0 z-50 backdrop-blur-md"
-      style={{
-        backgroundColor: 'var(--bg-nav)',
-        borderBottom: '1px solid var(--border)',
-        transition: 'background-color 0.2s ease',
-      }}
-    >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
-        <a
-          href="/"
-          className="text-sm font-semibold tracking-tight transition-colors"
-          style={{ color: 'var(--text-heading)' }}
-        >
-          Sameer Ahmadi<span style={{ color: 'var(--accent)' }}>.</span>
-        </a>
+    <header className="sticky top-0 z-50 backdrop-blur-md bg-nav border-b border-line">
+      {/* Only visible when tabbing with the keyboard */}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:px-4 focus:py-2 focus:rounded-lg focus:bg-accent focus:text-on-accent"
+      >
+        Skip to content
+      </a>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
+        <Link to="/" className="text-sm font-semibold tracking-tight text-heading">
+          {site.name}<span className="text-accent">.</span>
+        </Link>
+
+        <nav aria-label="Sections" className="hidden md:flex items-center gap-6 text-sm">
+          {navLinks.map((link) => (
+            <Link
+              key={link.hash}
+              to={{ pathname: '/', hash: link.hash }}
+              className="text-body transition-colors hover:text-heading"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
         <div className="flex items-center gap-3">
           <a
-            href="/Ahmad_Sameer_Ahmadi_Resume.pdf"
+            href={site.resume}
             download
-            className="resume-btn hidden sm:inline-flex items-center gap-1.5 rounded-lg text-xs font-medium transition-all duration-200"
-            style={{
-              padding: '6px 14px',
-              border: '1px solid var(--resume-btn-border)',
-              color: 'var(--text-heading)',
-            }}
+            className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium text-heading border border-outline transition-colors hover:border-outline-hover"
           >
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V3" />
-            </svg>
+            <DownloadIcon className="w-3 h-3" />
             Resume
           </a>
-          <div className="hidden sm:flex items-center gap-3 ml-1">
-            <SocialLink href="https://github.com/Sam11-coder" label="GitHub">
-              <GitHubIcon />
-            </SocialLink>
-            <SocialLink href="mailto:samirahmady01@gmail.com" label="Email">
-              <EmailIcon />
-            </SocialLink>
-            <SocialLink href="https://www.linkedin.com/in/sameer-ahmadi-854749253/" label="LinkedIn">
-              <LinkedInIcon />
-            </SocialLink>
-          </div>
+          <SocialLinks iconClassName="w-5 h-5" className="hidden sm:flex gap-3 ml-1" />
           <button
             onClick={toggle}
-            aria-label="Toggle theme"
-            className="p-2 rounded-lg transition-all duration-200 cursor-pointer hover:text-[var(--accent)]"
-            style={{ color: 'var(--text-muted)', backgroundColor: 'transparent' }}
-            onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--bg-status)'}
-            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+            aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+            className="p-2 rounded-lg cursor-pointer text-muted transition-all duration-200 hover:text-accent hover:bg-surface"
           >
             {dark ? <SunIcon /> : <MoonIcon />}
           </button>
+          <button
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+            className="md:hidden p-2 -mr-2 rounded-lg cursor-pointer text-muted transition-colors hover:text-accent hover:bg-surface"
+          >
+            <MenuIcon open={menuOpen} />
+          </button>
         </div>
       </div>
+
+      {menuOpen && (
+        <nav id="mobile-menu" aria-label="Sections" className="md:hidden border-t border-line px-4 pb-5 pt-2 animate-fade-in-up">
+          {navLinks.map((link) => (
+            <Link
+              key={link.hash}
+              to={{ pathname: '/', hash: link.hash }}
+              onClick={() => setMenuOpen(false)}
+              className="block py-3 text-base text-body border-b border-line transition-colors hover:text-heading"
+            >
+              {link.label}
+            </Link>
+          ))}
+          <div className="flex items-center justify-between pt-4">
+            <a
+              href={site.resume}
+              download
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium text-heading border border-outline"
+            >
+              <DownloadIcon className="w-3.5 h-3.5" />
+              Resume
+            </a>
+            <SocialLinks iconClassName="w-5 h-5" />
+          </div>
+        </nav>
+      )}
     </header>
   )
 }

@@ -1,64 +1,29 @@
-const skillCategories = [
-  {
-    heading: 'Languages & Scripting',
-    skills: ['Python', 'Bash'],
-  },
-  {
-    heading: 'Cloud & DevOps',
-    skills: ['AWS (GuardDuty, EC2)', 'Docker', 'Cloudflare'],
-  },
-  {
-    heading: 'Operating Systems & Infrastructure',
-    skills: ['Linux', 'Linux Servers (Ubuntu)'],
-  },
-  {
-    heading: 'Networking & Security',
-    skills: ['OPNsense (Firewall)', 'VirtualBox'],
-  },
-]
+import { skillGroups } from '../data/skills'
+import { SkillIcon } from './Icons'
+import SectionHeading from './SectionHeading'
 
 export default function SkillsSection() {
   return (
-    <section id="skills" className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
-      <div className="mb-10">
-        <h2
-          className="text-3xl font-bold tracking-tight mb-3"
-          style={{ color: 'var(--text-heading)' }}
-        >
-          Skills
-        </h2>
-        <p className="text-sm max-w-lg" style={{ color: 'var(--text-body)' }}>
-          Technologies and tools I work with, derived from hands-on project experience.
-        </p>
-      </div>
+    <section id="skills" className="scroll-mt-20 max-w-6xl mx-auto px-4 sm:px-6 py-16">
+      <SectionHeading path="skills" title="What I work with">
+        Things I've actually used in projects, labs and coursework.
+      </SectionHeading>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 stagger">
-        {skillCategories.map((category) => (
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 stagger">
+        {skillGroups.map((group) => (
           <div
-            key={category.heading}
-            className="animate-fade-in-up rounded-2xl p-6"
-            style={{
-              backgroundColor: 'var(--bg-card)',
-              border: '1px solid var(--border)',
-            }}
+            key={group.heading}
+            className={`reveal rounded-2xl p-6 border border-line-strong ${group.learning ? 'border-dashed' : 'bg-card'}`}
           >
-            <h3
-              className="text-sm font-semibold mb-4"
-              style={{ color: 'var(--text-heading)' }}
-            >
-              {category.heading}
-            </h3>
+            <div className="flex items-center gap-3 mb-4">
+              <span className="flex items-center justify-center w-9 h-9 rounded-lg text-accent bg-accent/12">
+                <SkillIcon name={group.icon} />
+              </span>
+              <h3 className="text-sm font-semibold text-heading">{group.heading}</h3>
+            </div>
             <div className="flex flex-wrap gap-2">
-              {category.skills.map((skill) => (
-                <span
-                  key={skill}
-                  className="px-3 py-1 text-xs font-medium rounded-full"
-                  style={{
-                    backgroundColor: 'var(--bg-status)',
-                    color: 'var(--accent)',
-                    border: '1px solid var(--border)',
-                  }}
-                >
+              {group.skills.map((skill) => (
+                <span key={skill} className="px-2.5 py-1 text-xs font-medium rounded-md bg-surface text-body border border-line">
                   {skill}
                 </span>
               ))}
